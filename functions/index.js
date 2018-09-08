@@ -2,6 +2,7 @@
 
 // Import the firebase-functions package for deployment.
 const functions = require('firebase-functions');
+const north = require('./opennorthclient')
 
 // Import the Dialogflow module and response creation dependencies
 // from the Actions on Google client library.
@@ -24,20 +25,34 @@ app.intent('Default Welcome Intent', (conv) => {
 
 // Handle the Dialogflow intent named 'actions_intent_PERMISSION'. If user
 // agreed to PERMISSION prompt, then boolean value 'permissionGranted' is true.
-app.intent('actions_intent_PERMISSION', (conv, params, permissionGranted) => {
+app.intent('actions_intent_PERMISSION', async (conv, params, permissionGranted) => {
   if (!permissionGranted) {
     conv.close(`Sorry, I need your location to find your local representative.`);
   } else {
-    console.log(conv);
     conv.data.lat = conv.device.location.coordinates.latitude;
     conv.data.lon = conv.device.location.coordinates.longitude;
-    conv.ask(`Thanks for providing your location!.`);
-    conv.followup('request_level_of_government');
+    conv.add(`Thanks for providing your location!`);
+    try {
+      let repsJSON = await north.getReps(conv.data.lat, conv.data.lon);
+      repsJSON = JSON.parse(repsJSON);
+      const repsByOffice = north.getOffices(repsJSON);
+      conv.data.repsByOffice = JSON.stringify(repsByOffice);
+      conv.ask(`Would you like to talk to your ${north.getConjoined(Object.keys(repsByOffice), 'or')}?`);
+    } catch (err) {
+      console.log(err);
+      conv.close('Sorry, something went wrong finding your representative.');
+    }
   }
 });
 
-app.intent('request_level_of_government', (conv, params) => {
-  conv.close(`You requested your ${params.level_of_government} representative.`);
+app.intent('actions_intent_PERMISSION - choose_office', (conv, params) => {
+  const repsByOffice = JSON.parse(conv.data.repsByOffice);
+  const rep = repsByOffice[params.office];
+  if (!rep) {
+    conv.close(`Couldn't find rep ${params.office} in any of ${north.getConjoined(Object.keys(repsByOffice), 'or')}.`)
+  } else {
+    conv.close(`Your local ${params.office}'s name is ${rep.name}. ` + north.getContactString(rep));
+  }
 });
 
 // Set the DialogflowApp object to handle the HTTPS POST request.

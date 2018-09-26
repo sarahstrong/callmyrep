@@ -12,7 +12,7 @@ const {
   Permission,
   BasicCard,
   Button,
-  OpenUrlAction,
+  NewSurface,
 } = require('actions-on-google');
 
 // Instantiate the Dialogflow client.
@@ -27,7 +27,7 @@ app.middleware((conv) => {
 app.intent('Default Welcome Intent', (conv) => {
   // Asks the user's permission to know their name, for personalization.
   conv.utils.ask(new Permission({
-    context: ' Hi there! To find your local representative',
+    context: 'To find your local representative',
     permissions: 'DEVICE_PRECISE_LOCATION',
   }));
 });
@@ -40,7 +40,6 @@ app.intent('actions_intent_PERMISSION', async (conv, params, permissionGranted) 
   } else {
     conv.data.lat = conv.device.location.coordinates.latitude;
     conv.data.lon = conv.device.location.coordinates.longitude;
-    conv.utils.add(`Thanks for providing your location!`);
     try {
       const repsJSON = await north.getReps(conv.data.lat, conv.data.lon);
       const repsByOffice = north.getOffices(repsJSON);
@@ -62,15 +61,33 @@ app.intent('actions_intent_PERMISSION - choose_office', (conv, params) => {
     conv.utils.close(`Couldn't find rep ${params.office} in any of ${reps}.`)
   } else {
     const repInfo = `Your local ${params.office}'s name is ${rep.name}. ${north.getContactString(rep)}`;
-    if (conv.utils.screen) {
+    if (conv.utils.screenActive) {
       conv.utils.close(repInfo, getRepCard());
+    } else if (conv.utils.screenAvailable) {
+      conv.data.repInfo = repInfo;
+      const context = 'I have contact information for you.';
+      const notification = 'Contact your local representative';
+      const capabilities = ['actions.capability.SCREEN_OUTPUT'];
+      conv.utils.ask(new NewSurface({context, notification, capabilities}));
     } else {
-      conv.utils.ask(repInfo);
+      conv.utils.ask(`${repInfo} Would you like me to repeat that?`);
     }
   }
 });
 
-app.intent('reprompt', (conv) => {
+app.intent('new surface', (conv, input, newSurface) => {
+  const repInfo = conv.data.repInfo;
+  if (newSurface.status === 'OK') {
+    conv.utils.close(repInfo, getRepCard());
+  } else {
+    conv.utils.ask(`${repInfo} Would you like me to repeat that?`);
+  }
+});
+
+app.intent(['reprompt',
+            'new surface - yes',
+            'actions_intent_PERMISSION - choose_office - yes'], (conv) => {
+  conv.utils.retainCurrentContexts();
   conv.utils.ask(conv.data.lastResponse);
 });
 

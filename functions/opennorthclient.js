@@ -1,23 +1,20 @@
 'use strict';
-const request = require('request');
-
-const bodyParser = require('body-parser');
+const request = require('request-promise-native');
 
 const baseURL = 'https://represent.opennorth.ca/'
 
 // Get representatives for a location
-function getReps(lat, lon) {
-  return new Promise((resolve, reject) => {
-    const url = baseURL + 'representatives';
-    const q = { point: `${lat},${lon}` };
-    request({ url: url, qs: q }, (err, res) => {
-      if (err) {
-        console.log(err);
-        return reject(err);
-      }
-      return resolve(res.body);
-    });
-  });
+async function getReps(lat, lon) {
+  const url = baseURL + 'representatives';
+  const q = { point: `${lat},${lon}` };
+  const response = await request({ url: url, qs: q });
+  try {
+    return JSON.parse(response);
+  } catch (e) {
+    console.log(e);
+    console.log(response);
+    throw e;
+  }
 }
 exports.getReps = getReps;
 
@@ -36,20 +33,10 @@ function getOffices(repsJSON) {
 exports.getOffices = getOffices;
 
 /**
- * Return list of strings as a sentence fragment with conjunction.
- * Example: (['apples, 'oranges', 'bananas'], 'or') => 'apples, oranges, and bananas'
+ * Return string explaining how to contact the rep
+ * @param  {[type]} rep JSON chunk for a representative as returned by the OpenNorth API
+ * @return {[type]}     String explaining email and phone methods of contacting the rep
  */
-function getConjoined(list, conjunction) {
-  if (list.length === 1) {
-    return list[0];
-  } else if (list.length === 2) {
-    return `${list[0]} ${conjunction} ${list[1]}`;
-  } else {
-    return `${list.slice(0, -1).join(', ')}, ${conjunction} ${list[list.length - 1]}`;
-  }
-}
-exports.getConjoined = getConjoined;
-
 function getContactString(rep) {
   let contactString = '';
   if (rep.email) {
@@ -69,8 +56,24 @@ function getContactString(rep) {
     }
   }
   if (phones.length > 0) {
-    contactString = contactString + ` You can call ${getConjoined(phones, 'or')}.`
+    contactString = `${contactString} You can call ${getConjoined(phones, 'or')}.`
   }
   return contactString;
 }
 exports.getContactString = getContactString;
+
+
+/**
+ * Return list of strings as a sentence fragment with conjunction.
+ * Example: (['apples, 'oranges', 'bananas'], 'or') => 'apples, oranges, and bananas'
+ */
+function getConjoined(list, conjunction) {
+  if (list.length === 1) {
+    return list[0];
+  } else if (list.length === 2) {
+    return `${list[0]} ${conjunction} ${list[1]}`;
+  } else {
+    return `${list.slice(0, -1).join(', ')}, ${conjunction} ${list[list.length - 1]}`;
+  }
+}
+exports.getConjoined = getConjoined;

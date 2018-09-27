@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>My local representative</title>
+  <meta name="description" content="View elected representatives for Canada via latitude and longitude">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="canonical" href="file:///home/sarah/projects/callmyrep/public/jq.html">
+  <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/careps.css">
+
+</head>
+
+<body>
+
+  <div class="jumbotron bg-primary" id="header">
+    <div class="container-fluid text-center">
+      <h1>My local reps</h1>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" id="no-results">
+    We couldn't find your address. Please try <a href="https://represent.opennorth.ca/demo/">searching</a>.
+  </div>
+
+  <div id="results">
+
+    <div class="container-fluid">
+      <div id="representatives"></div>
+    </div>
+  </div>
+
+  <div class="text-center" id="linkout">
+    <a href="https://represent.opennorth.ca/demo/" class="btn btn-primary text-center pagination-centered">Find more representatives</a>
+  </div>
+
+  <div class="container-fluid banner" id="footer">
+    <p>Powered by <a href="http://www.opennorth.ca/">Open North</a></p>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+  <script src="js/careps.js"></script>
+
+</body>
+
+</html>

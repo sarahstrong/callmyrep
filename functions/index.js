@@ -62,7 +62,7 @@ app.intent('actions_intent_PERMISSION - choose_office', (conv, params) => {
   } else {
     const repInfo = `Your local ${params.office}'s name is ${rep.name}. ${north.getContactString(rep)}`;
     if (conv.utils.screenActive) {
-      conv.utils.close(repInfo, getRepCard());
+      conv.utils.close(repInfo, getRepCard(conv.data.lat, conv.data.lon));
     } else if (conv.utils.screenAvailable) {
       conv.data.repInfo = repInfo;
       const context = 'I have contact information for you.';
@@ -78,7 +78,7 @@ app.intent('actions_intent_PERMISSION - choose_office', (conv, params) => {
 app.intent('new surface', (conv, input, newSurface) => {
   const repInfo = conv.data.repInfo;
   if (newSurface.status === 'OK') {
-    conv.utils.close(repInfo, getRepCard());
+    conv.utils.close(repInfo, getRepCard(conv.data.lat, conv.data.lon));
   } else {
     conv.utils.ask(`${repInfo} Would you like me to repeat that?`);
   }
@@ -91,12 +91,12 @@ app.intent(['reprompt',
   conv.utils.ask(conv.data.lastResponse);
 });
 
-function getRepCard() {
+function getRepCard(lat, lon) {
   return new BasicCard({
-    text: 'Contact your local representatives',
+    text: 'Your local representatives',
     buttons: new Button({
-      title: 'Go',
-      url: 'http://represent.opennorth.ca/demo/',
+      title: 'Contact',
+      url: `https://callmyrep-a41f7.firebaseapp.com/careps.html?lat=${lat}&lon=${lon}`,
     }),
   });
 }

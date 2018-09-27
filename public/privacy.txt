@@ -1,0 +1,7 @@
+My Local Representative Privacy Policy
+
+This app collects your current location (latitude and longitude) from Google for the sole purpose of showing you your local representatives. Your location is not retained and will never be shared with outside services except to query for representative information.
+
+Attribution
+
+This app uses Dave Bonta's maple leaf image as a cover image, generously made available via Creative Commons license https://creativecommons.org/licenses/by-sa/2.0/. View it at https://www.flickr.com/photos/89056025@N00/7469588892/.

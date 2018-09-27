@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "callmyrep-a41f7"
+    "default": "callmyrep-a41f7",
+    "dev": "callmyrepdev",
+    "prod": "callmyrep-a41f7"
   }
 }

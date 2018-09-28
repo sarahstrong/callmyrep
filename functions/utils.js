@@ -42,5 +42,19 @@ class Utils {
     }
   }
 }
+exports.Utils = Utils;
 
-module.exports = { Utils };
+/**
+ * Return list of strings as a sentence fragment with conjunction.
+ * Example: (['apples, 'oranges', 'bananas'], 'or') => 'apples, oranges, and bananas'
+ */
+function getConjoined(list, conjunction) {
+  if (list.length === 1) {
+    return list[0];
+  } else if (list.length === 2) {
+    return `${list[0]} ${conjunction} ${list[1]}`;
+  } else {
+    return `${list.slice(0, -1).join(', ')}, ${conjunction} ${list[list.length - 1]}`;
+  }
+}
+exports.getConjoined = getConjoined;

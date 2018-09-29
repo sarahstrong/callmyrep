@@ -1,105 +1,40 @@
+// Copyright 2018, Google, Inc.
+// Licensed under the Apache License, Version 2.0 (the 'License');
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an 'AS IS' BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 'use strict';
+/* eslint-disable */
 
-// Import the firebase-functions package for deployment.
-const functions = require('firebase-functions');
-const north = require('./opennorthclient')
-const utils = require('./utils');
+/** EXPORT ALL FUNCTIONS
+ *
+ *   - Loads all `.function.js` files
+ *   - Supports multiple exports from a single `.function.js` file
+ *   - It is optimized with `FUNCTION_NAME` env and omiting `node_modules` as well
+ *   - Every function from any file must have unique name
+ *   - Default export is not supported (`module.exports = ...`), instead use: `module.exports.functionName = ...`
+ *
+ *   Based on this thread:
+ *     https://github.com/firebase/functions-samples/issues/170
+ */
+const glob = require('glob') // npm i -S glob
+const files = glob.sync('./**/*.function.js', { cwd: __dirname, ignore: './node_modules/**' })
 
-// Import the Dialogflow module and response creation dependencies
-// from the Actions on Google client library.
-const {
-  dialogflow,
-  Permission,
-  BasicCard,
-  Button,
-  NewSurface,
-} = require('actions-on-google');
+files.forEach(file => {
+  const functionModule = require(file)
+  const functionNames = Object.keys(functionModule)
 
-// Instantiate the Dialogflow client.
-const app = dialogflow({ debug: true });
-
-app.middleware((conv) => {
-  console.log(`Intent=${conv.intent}`);
-  conv.utils = new utils.Utils(conv);
-});
-
-// Handle the Dialogflow intent named 'Default Welcome Intent'.
-app.intent('Default Welcome Intent', (conv) => {
-  // Asks the user's permission to know their name, for personalization.
-  conv.utils.ask(new Permission({
-    context: 'To find your local representative',
-    permissions: 'DEVICE_PRECISE_LOCATION',
-  }));
-});
-
-// Handle the Dialogflow intent named 'actions_intent_PERMISSION'. If user
-// agreed to PERMISSION prompt, then boolean value 'permissionGranted' is true.
-app.intent('actions_intent_PERMISSION', async (conv, params, permissionGranted) => {
-  if (!permissionGranted) {
-    conv.close(`Sorry, I need your location to find your local representative.`);
-  } else {
-    conv.data.lat = conv.device.location.coordinates.latitude;
-    conv.data.lon = conv.device.location.coordinates.longitude;
-    try {
-      const repsJSON = await north.getReps(conv.data.lat, conv.data.lon);
-      const repsByOffice = north.getOffices(repsJSON);
-      conv.data.repsByOffice = JSON.stringify(repsByOffice);
-      const reps = utils.getConjoined(Object.keys(repsByOffice), 'or');
-      conv.utils.ask(`Would you like to talk to your ${reps}?`);
-    } catch (err) {
-      console.log(err);
-      conv.utils.close('Sorry, something went wrong finding your representative. Your location may not be supported.');
+  functionNames.forEach(functionName => {
+    if (!process.env.FUNCTION_NAME || process.env.FUNCTION_NAME === functionName) {
+      exports[functionName] = functionModule[functionName]
     }
-  }
-});
-
-app.intent('actions_intent_PERMISSION - choose_office', (conv, params) => {
-  const repsByOffice = JSON.parse(conv.data.repsByOffice);
-  const rep = repsByOffice[params.office][0];
-  if (!rep) {
-    const reps = utils.getConjoined(Object.keys(repsByOffice), 'or');
-    conv.utils.close(`Couldn't find rep ${params.office} in any of ${reps}.`)
-  } else {
-    const repInfo = `Your local ${params.office}'s name is ${rep.name}. ${rep.contactString}`;
-    if (conv.utils.screenActive) {
-      conv.utils.close(repInfo, getRepCard(conv.data.lat, conv.data.lon));
-    } else if (conv.utils.screenAvailable) {
-      conv.data.repInfo = repInfo;
-      const context = 'I have contact information for you.';
-      const notification = 'Contact your local representative';
-      const capabilities = ['actions.capability.SCREEN_OUTPUT'];
-      conv.utils.ask(new NewSurface({context, notification, capabilities}));
-    } else {
-      conv.utils.ask(`${repInfo} Would you like me to repeat that?`);
-    }
-  }
-});
-
-app.intent('new surface', (conv, input, newSurface) => {
-  const repInfo = conv.data.repInfo;
-  if (newSurface.status === 'OK') {
-    conv.utils.close(repInfo, getRepCard(conv.data.lat, conv.data.lon));
-  } else {
-    conv.utils.ask(`${repInfo} Would you like me to repeat that?`);
-  }
-});
-
-app.intent(['reprompt',
-            'new surface - yes',
-            'actions_intent_PERMISSION - choose_office - yes'], (conv) => {
-  conv.utils.retainCurrentContexts();
-  conv.utils.ask(conv.data.lastResponse);
-});
-
-function getRepCard(lat, lon) {
-  return new BasicCard({
-    text: 'Your local representatives',
-    buttons: new Button({
-      title: 'Contact',
-      url: `https://callmyrep-a41f7.firebaseapp.com/careps.html?lat=${lat}&lon=${lon}`,
-    }),
-  });
-}
-
-// Set the DialogflowApp object to handle the HTTPS POST request.
-exports.dialogflowFirebaseFulfillment = functions.https.onRequest(app);
+  })
+})

@@ -19,10 +19,9 @@ const officeSearchStrings = {
 
 // Get representatives for a location
 async function getReps(lat, lon) {
-  const url = baseURL + 'representatives';
   const key = functions.config().civicinfo.key;
   const q = { address: `${lat},${lon}`, key: key };
-  const response = await request({ url: url, qs: q });
+  const response = await request({ url: baseURL, qs: q });
   try {
     const json = JSON.parse(response);
     if (json.error) {
@@ -47,6 +46,39 @@ function getOffices(rawJSON) {
     console.log(`Error (${e}) JSON: ${rawJSON}`);
     throw new Error('Malformed JSON');
   }
+  const officeIndices = getRecognizedOfficeIndices(rawOffices);
+  let officeMap = {};
+  let rep, index, officeName;
+  for (let i = 0; i < Object.keys(officeIndices).length; i++) {
+    officeName = Object.keys(officeIndices)[i];
+    officeMap[officeName] = [];
+    for (let j = 0; j < officeIndices[officeName].length; j++) {
+      index = officeIndices[officeName][j];
+      rep = repFromRaw(officeName, rawJSON.officials[index]);
+      officeMap[officeName].push(rep);
+    }
+  }
+  return officeMap;
+}
+exports.getOffices = getOffices;
+
+function getRawRepsWithOffice(rawJSON) {
+  let rawReps = [];
+  let rep, office;
+  for (let i = 0; i < rawJSON.offices.length; i++) {
+    office = rawJSON.offices[i];
+    for (let j = 0; j < office.officialIndices.length; j++) {
+      rep = rawJSON.officials[office.officialIndices[j]];
+      rep.officeName = office.name;
+      rep.firstName = rep.name.split(' ')[0];
+      rawReps.push(rep);
+    }
+  }
+  return rawReps;
+}
+exports.getRawRepsWithOffice = getRawRepsWithOffice;
+
+function getRecognizedOfficeIndices(rawOffices) {
   let officeIndices = {};
   let officeName, searchString;
   for (let i = 0; i < rawOffices.length; i++) {
@@ -62,20 +94,8 @@ function getOffices(rawJSON) {
       }
     }
   }
-  let officeMap = {};
-  let rep, index;
-  for (let i = 0; i < Object.keys(officeIndices).length; i++) {
-    officeName = Object.keys(officeIndices)[i];
-    officeMap[officeName] = [];
-    for (let j = 0; j < officeIndices[officeName].length; j++) {
-      index = officeIndices[officeName][j];
-      rep = repFromRaw(officeName, rawJSON.officials[index]);
-      officeMap[officeName].push(rep);
-    }
-  }
-  return officeMap;
+  return officeIndices;
 }
-exports.getOffices = getOffices;
 
 function repFromRaw(office, rawRep) {
   let rep = new Representative(rawRep.name, office);

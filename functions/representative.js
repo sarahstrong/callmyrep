@@ -24,7 +24,7 @@ class Representative {
   setContactString() {
     let contactString = '';
     if (this.email) {
-      contactString = `You can email them at ${this.email}.`;
+      contactString = `You can email them at ${this.email}. `;
     }
     let phoneStrs = [];
     let phone;
@@ -40,7 +40,7 @@ class Representative {
       }
     }
     if (phoneStrs.length > 0) {
-      contactString = [contactString, `You can call ${utils.getConjoined(phoneStrs, 'or')}.`].join(' ');
+      contactString = contactString + `You can call ${utils.getConjoined(phoneStrs, 'or')}.`;
     }
     this.contactString = contactString;
   }

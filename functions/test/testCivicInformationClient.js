@@ -29,3 +29,14 @@ describe('repFromRaw()', () => {
     expect(rep.contactString).to.be.equal('You can email them at teresa.mosqueda@seattle.gov. You can call them at (206) 684-8806.');
   });
 });
+
+describe('getRawRepsWithOffice()', () => {
+  it('should generate a list of all reps', () => {
+    expect(civicInfoClient.getRawRepsWithOffice(json).length).to.be.equal(24);
+  });
+  it('should include expected office names', () => {
+    expect(civicInfoClient.getRawRepsWithOffice(json)[5].officeName).to.be.equal('Governor');
+    expect(civicInfoClient.getRawRepsWithOffice(json)[5].name).to.be.equal('Jay Inslee');
+    expect(civicInfoClient.getRawRepsWithOffice(json)[5].firstName).to.be.equal('Jay');
+  });
+});

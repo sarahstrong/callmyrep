@@ -4,11 +4,14 @@ const utils = require('./utils');
 
 class Representative {
 
-  constructor(name, office, email) {
+  constructor(name, office) {
     this.name = name;
     this.office = office;
-    this.email = email;
     this.phones = [];
+  }
+
+  addEmail(email) {
+    this.email = email;
   }
 
   addPhone(number, type) {
@@ -37,7 +40,7 @@ class Representative {
       }
     }
     if (phoneStrs.length > 0) {
-      contactString = `${contactString} You can call ${utils.getConjoined(phoneStrs, 'or')}.`
+      contactString = [contactString, `You can call ${utils.getConjoined(phoneStrs, 'or')}.`].join(' ');
     }
     this.contactString = contactString;
   }

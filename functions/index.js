@@ -48,14 +48,14 @@ app.intent('actions_intent_PERMISSION', async (conv, params, permissionGranted) 
       conv.utils.ask(`Would you like to talk to your ${reps}?`);
     } catch (err) {
       console.log(err);
-      conv.utils.close('Sorry, something went wrong finding your representative.');
+      conv.utils.close('Sorry, something went wrong finding your representative. Your location may not be supported.');
     }
   }
 });
 
 app.intent('actions_intent_PERMISSION - choose_office', (conv, params) => {
   const repsByOffice = JSON.parse(conv.data.repsByOffice);
-  const rep = repsByOffice[params.office];
+  const rep = repsByOffice[params.office][0];
   if (!rep) {
     const reps = utils.getConjoined(Object.keys(repsByOffice), 'or');
     conv.utils.close(`Couldn't find rep ${params.office} in any of ${reps}.`)

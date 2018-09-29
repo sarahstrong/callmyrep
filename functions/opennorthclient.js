@@ -10,7 +10,11 @@ async function getReps(lat, lon) {
   const q = { point: `${lat},${lon}` };
   const response = await request({ url: url, qs: q });
   try {
-    return JSON.parse(response);
+    const json = JSON.parse(response);
+    if (json.objects.length === 0) {
+      throw Error(`No representatives found for address ${lat},${lon}`);
+    }
+    return json;
   } catch (e) {
     console.log(e);
     console.log(response);
@@ -22,19 +26,29 @@ exports.getReps = getReps;
 // Take JSON as returned by getReps and return a map of available offices
 // to the corresponding rep. Example offices: ['Mayor', 'City councilor', 'MP, 'MPP']
 function getOffices(repsJSON) {
-  const rawReps = repsJSON.objects;
+  let rawReps;
+  try {
+    rawReps = repsJSON.objects;
+  } catch (e) {
+    console.log(`Error (${e}) JSON: ${repsJSON}`);
+    throw new Error('Malformed JSON');
+  }
+  if (rawReps.length === 0) {
+    throw new Error('No results');
+  }
   let offices = {};
   let rawRep;
   for (let i = 0; i < rawReps.length; i++) {
     rawRep = rawReps[i];
-    offices[rawRep.elected_office] = repFromRaw(rawRep);
+    offices[rawRep.elected_office] = [repFromRaw(rawRep)];
   }
   return offices;
 }
 exports.getOffices = getOffices;
 
 function repFromRaw(rawRep) {
-  let rep = new Representative(rawRep.name, rawRep.elected_office, rawRep.email);
+  let rep = new Representative(rawRep.name, rawRep.elected_office);
+  rep.addEmail(rawRep.email);
   if (rawRep.offices) {
     let office;
     for (let i = 0; i < rawRep.offices.length; i++) {

@@ -12,8 +12,6 @@ const officeSearchStrings = {
   'senate': 'Senator',
   'house of representatives': 'House Rep',
   '^governor$': 'Governor',
-  'president of the united states': 'President',
-  'vice-president of the united states': 'Vice-President',
   '^sheriff$': 'Sheriff',
 }
 

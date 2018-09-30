@@ -63,8 +63,8 @@
   margin-bottom: 20px;
   padding-top: 100%;
   border-radius: 100%;
-  border: 3px solid #eee;
   background-color: #c7d1cd;
+  background-image: url(../assets/Missing_avatar.svg);
   background-position: 0% 17%;
   background-repeat: no-repeat;
   background-size: 100% auto; /* not same as cover */

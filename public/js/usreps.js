@@ -2,7 +2,7 @@
 
 var representativeTemplate = _.template(
       '<div class="col-xs-6 col-sm-4 col-md-2 representative">' +
-        '<div class="avatar" style="<% if (rep.photoUrl) { %>background-image: url(<%= rep.photoUrl %><% } %>)"></div> ' +
+        '<div class="avatar" style="<% if (rep.photoUrl) { %>background-image: url(<%= rep.photoUrl %>), url(../assets/Missing_avatar.svg)<% } %>"></div> ' +
         '<p><%= rep.officeName %>, <% if (rep.party) { %><%= rep.party %><% } %></p>' +
         '<p><strong><% if (rep.urls) { %><a href="<%= rep.urls[0] %>"><%= rep.name %></a><% } else { %><%= rep.name %><% } %></strong></p> ' +
         '<p><% if (rep.emails) { %><a href="mailto:<%= rep.emails[0] %>"> Email <%= rep.firstName %></a><% } %></p> ' +

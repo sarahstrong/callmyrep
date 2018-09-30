@@ -2,18 +2,18 @@
 
 var representativeTemplate = _.template(
       '<div class="col-xs-6 col-sm-4 col-md-2 representative">' +
-        '<div class="avatar" style="<% if (photo_url) { %>background-image: url(<%= photo_url %><% } %>)"></div> ' +
-        '<p><% if (party_name) { %><%= party_name %><% } %> <%= elected_office %> ' +
-        '<strong><% if (url) { %><a href="<%= url %>"><%= name %></a><% } else { %><%= name %><% } %></strong></p> ' +
-        '<p class="district-name"><%= district_name %></p>' +
-        '<p><% if (email) { %><a href="mailto:<%= email %>"> Email <%= first_name %></a><% } %></p> ' +
-        '<% if (offices) { %>' +
-          '<% for (var i = 0; i < offices.length; ++i) { %>' +
-            '<p><% if (offices[i].tel) { %><a href="tel:<%= offices[i].tel %>">' +
-            '<% if (offices[i].type) { %>' +
-              'Call <%= first_name %> on their <%= offices[i].type %> line<% } %>' +
+        '<div class="avatar" style="<% if (rep.photo_url) { %>background-image: url(<%= rep.photo_url %>), url(../assets/Missing_avatar.svg)<% } %>"></div> ' +
+        '<p><% if (rep.party_name) { %><%= rep.party_name %><% } %> <%= rep.elected_office %> ' +
+        '<strong><% if (rep.url) { %><a href="<%= rep.url %>"><%= rep.name %></a><% } else { %><%= rep.name %><% } %></strong></p> ' +
+        '<p class="district-name"><%= rep.district_name %></p>' +
+        '<p><% if (rep.email) { %><a href="mailto:<%= rep.email %>"> Email <%= rep.first_name %></a><% } %></p> ' +
+        '<% if (rep.offices) { %>' +
+          '<% for (var i = 0; i < rep.offices.length; ++i) { %>' +
+            '<p><% if (rep.offices[i].tel) { %><a href="tel:<%= rep.offices[i].tel %>">' +
+            '<% if (rep.offices[i].type) { %>' +
+              'Call <%= rep.first_name %> on their <%= rep.offices[i].type %> line<% } %>' +
             '<% } else { %>' +
-              'Call <%= first_name %>' +
+              'Call <%= rep.first_name %>' +
             '<% } %></a></p>' +
           '<% } %>' +
         '<% } %>' +
@@ -42,7 +42,7 @@ function getReps(lat, lon) {
 
     $.each(representatives, function (i, object) {
       if (isElected(object)) {
-        $row.append($(representativeTemplate(object)));
+        $row.append($(representativeTemplate({rep: object})));
       }
     });
 

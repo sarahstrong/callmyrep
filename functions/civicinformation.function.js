@@ -14,7 +14,6 @@ app.get('/usReps/:latlon', async (req, res) => {
 
   let lat, lon;
   try {
-    console.log(req.params.latlon);
     const splitLL = req.params.latlon.split(',');
     lat = splitLL[0];
     lon = splitLL[1];

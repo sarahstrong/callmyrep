@@ -8,9 +8,9 @@ const json = JSON.parse(`{ "kind": "civicinfo#representativeInfoResponse", "norm
 const errorJSON = JSON.parse(`{ "error": {  "errors": [   {    "domain": "global",    "reason": "parseError",    "message": "Failed to parse address"   }  ],  "code": 400,  "message": "Failed to parse address" }}`);
 
 describe('getOffices()', () => {
-  it('should get a map with keys of available offices', () => {
+  it('should get a map with keys of available recognized offices', () => {
     const offices = civicInfoClient.getOffices(json);
-    const keys = ["President", "Vice-President", "Senator", "House Rep", "Governor", "Sheriff", "Mayor", "Councillor", "Attorney General"];
+    const keys = ["Senator", "House Rep", "Governor", "Sheriff", "Mayor", "Councillor", "Attorney General"];
     expect(Object.keys(offices)).to.eql(keys);
   });
   it('should get a map of offices to appropriate reps', () => {

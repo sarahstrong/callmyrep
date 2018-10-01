@@ -25,11 +25,14 @@ function getReps(lat, lon) {
       $('#no-results').fadeIn('slow');
     }
 
-    var $representatives = $('<div id="representatives"><div class="row">');
+    var $representatives = $('<div id="representatives"></div>');
+    var $row = $('<div class="row">');
+    $representatives.append($row);
+
     $.each(representatives, function (i, object) {
-      $representatives.append($(representativeTemplate({rep: object})));
+      $row.append($(representativeTemplate({rep: object})));
     });
-    $representatives.append('</div></div>');
+    $row.append('</div>');
 
     $('#representatives').replaceWith($representatives);
   });

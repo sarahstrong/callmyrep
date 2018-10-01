@@ -1,7 +1,7 @@
 // Based on https://represent.opennorth.ca/demo/
 
 var representativeTemplate = _.template(
-      '<div class="col-xs-6 col-sm-4 col-md-2 representative">' +
+      '<div class="col-xs-6 col-sm-4 col-md-4 representative">' +
         '<div class="avatar" style="<% if (rep.photo_url) { %>background-image: url(<%= rep.photo_url %>), url(../assets/Missing_avatar.svg)<% } %>"></div> ' +
         '<p><% if (rep.party_name) { %><%= rep.party_name %><% } %> <%= rep.elected_office %> ' +
         '<strong><% if (rep.url) { %><a href="<%= rep.url %>"><%= rep.name %></a><% } else { %><%= rep.name %><% } %></strong></p> ' +
@@ -36,15 +36,13 @@ function getReps(lat, lon) {
       $('#no-results').fadeIn('slow');
     }
 
-    var $representatives = $('<div id="representatives"></div>');
-    var $row = $('<div class="row"></div>');
-    $representatives.append($row);
-
+    var $representatives = $('<div id="representatives"><div class="row">');
     $.each(representatives, function (i, object) {
       if (isElected(object)) {
-        $row.append($(representativeTemplate({rep: object})));
+        $representatives.append($(representativeTemplate({rep: object})));
       }
     });
+    $representatives.append('</div></div>');
 
     $('#representatives').replaceWith($representatives);
   });

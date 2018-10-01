@@ -1,7 +1,7 @@
 // Based on https://represent.opennorth.ca/demo/
 
 var representativeTemplate = _.template(
-      '<div class="col-xs-6 col-sm-4 col-md-2 representative">' +
+      '<div class="col-xs-6 col-sm-4 col-md-4 representative">' +
         '<div class="avatar" style="<% if (rep.photoUrl) { %>background-image: url(<%= rep.photoUrl %>), url(../assets/Missing_avatar.svg)<% } %>"></div> ' +
         '<p><%= rep.officeName %>, <% if (rep.party) { %><%= rep.party %><% } %></p>' +
         '<p><strong><% if (rep.urls) { %><a href="<%= rep.urls[0] %>"><%= rep.name %></a><% } else { %><%= rep.name %><% } %></strong></p> ' +
@@ -9,10 +9,6 @@ var representativeTemplate = _.template(
         '<% if (rep.phones) { %><a href="tel:<%= rep.phones[0] %>"> Call <%= rep.firstName %></a><% } %></p> ' +
       '</div>'
     );
-
-function isElected(repObj) {
-  return repObj['elected_office'] && repObj['related']['representative_set_url'].indexOf('/campaign-set-') === -1;
-}
 
 function getReps(lat, lon) {
 
@@ -29,13 +25,11 @@ function getReps(lat, lon) {
       $('#no-results').fadeIn('slow');
     }
 
-    var $representatives = $('<div id="representatives"></div>');
-    var $row = $('<div class="row"></div>');
-    $representatives.append($row);
-
+    var $representatives = $('<div id="representatives"><div class="row">');
     $.each(representatives, function (i, object) {
-      $row.append($(representativeTemplate({rep: object})));
+      $representatives.append($(representativeTemplate({rep: object})));
     });
+    $representatives.append('</div></div>');
 
     $('#representatives').replaceWith($representatives);
   });

@@ -55,6 +55,22 @@
   margin-bottom: 0;
 }
 
+.results {
+  max-width: 740px;
+}
+
+.row {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+  flex-wrap: wrap;
+}
+.row > [class*='col-'] {
+  display: flex;
+  flex-direction: column;
+}
+
 /* https://stackoverflow.com/questions/5445491/height-equal-to-dynamic-width-css-fluid-layout */
 .avatar {
   overflow: hidden;

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>My local representative</title>
-  <meta name="description" content="View elected representatives for Canada via latitude and longitude">
+  <meta name="description" content="View elected representatives for the USA via latitude and longitude">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="canonical" href="file:///home/sarah/projects/callmyrep/public/jq.html">
   <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -23,11 +23,9 @@
   <div class="alert alert-danger" id="no-results">
     We couldn't find your address.
   </div>
-
-  <div id="results">
-    <div class="container-fluid">
-      <div id="representatives"></div>
-    </div>
+  
+  <div id="results" class="container results">
+    <div id="representatives"></div>
   </div>
 
   <div class="container-fluid banner" id="footer">

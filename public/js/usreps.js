@@ -12,7 +12,7 @@ var representativeTemplate = _.template(
 
 function getReps(lat, lon) {
 
-  const url = 'https://us-central1-callmyrepdev.cloudfunctions.net/civicinfo/usreps/' + lat + ',' + lon;
+  const url = 'https://us-central1-callmyrep-a41f7.cloudfunctions.net/civicinfo/usreps/' + lat + ',' + lon;
 
   $.ajax({dataType: 'json', url: url}).then(function (response) {
 

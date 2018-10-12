@@ -4,7 +4,7 @@
 
 Finds your local representative's contact information on your Home device.
 
-Try it by saying "Talk to my local representative" to your Google Home or Assistant
+See it in action in the [Actions Directory](https://assistant.google.com/services/a/uid/0000001295671e49?hl=en) or try it by saying "Talk to my local representative" to your Google Home or Assistant
 
 ## Setup Instructions
 
